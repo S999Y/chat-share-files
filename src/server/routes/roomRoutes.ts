@@ -21,10 +21,10 @@ router.use(requireAuth as any);
 
 router.post("/create", createRoom as any);
 router.post("/join", joinRoom as any);
-router.get("/all", getAllRooms as any);
 router.post("/:code/approve", approveJoinRequestController as any);
 router.post("/:code/reject", rejectJoinRequestController as any);
 router.post("/:code/timer", updateRoomTimerController as any);
+router.get("/all", getAllRooms as any);
 router.get("/:code", getRoomDetails as any);
 router.get("/:code/messages", getRoomMessages as any);
 router.get("/:code/files", getRoomFiles as any);
