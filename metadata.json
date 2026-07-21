@@ -1,0 +1,6 @@
+{
+  "name": "Chat and File Share",
+  "description": "A secure, real-time chat room and file-sharing platform with password-protected file downloads and room isolated messaging.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
