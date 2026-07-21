@@ -567,17 +567,19 @@ export default function ChatRoom() {
               {onlineUsers.map((u) => (
                 <div 
                   key={u.socketId} 
-                  className="flex items-center gap-2.5 px-3 py-2 rounded-xl bg-slate-900/40 border border-slate-850/30 text-slate-200"
+                  className="flex items-center justify-between gap-2.5 px-3 py-2 rounded-xl bg-slate-900/40 border border-slate-850/30 text-slate-200"
                 >
-                  <div className="relative shrink-0">
-                    <div className="h-7 w-7 rounded-lg bg-indigo-600/20 text-indigo-400 border border-indigo-500/10 flex items-center justify-center font-bold text-xs uppercase">
-                      {u.username[0]}
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <div className="relative shrink-0">
+                      <div className="h-7 w-7 rounded-lg bg-indigo-600/20 text-indigo-400 border border-indigo-500/10 flex items-center justify-center font-bold text-xs uppercase">
+                        {u.username[0]}
+                      </div>
+                      <div className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-emerald-500 border border-slate-950" />
                     </div>
-                    <div className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-emerald-500 border border-slate-950" />
-                  </div>
-                  <div className="min-w-0 text-xs">
-                    <p className="font-semibold text-white truncate">{u.username}</p>
-                    {u.userId === user?._id && <p className="text-[10px] text-slate-500">You</p>}
+                    <div className="min-w-0 text-xs">
+                      <p className="font-semibold text-white truncate">{u.username}</p>
+                      {u.userId === user?._id && <p className="text-[10px] text-slate-500">You</p>}
+                    </div>
                   </div>
                 </div>
               ))}
