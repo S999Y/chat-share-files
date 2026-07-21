@@ -31,11 +31,18 @@ export function setupSocketEvents(io: Server) {
 
       // Get updated list of online users using fetchSockets
       const socketsInRoom = await io.in(roomId).fetchSockets();
-      const usersInRoom = socketsInRoom.map((s) => ({
-        userId: s.data.userId,
-        username: s.data.username,
-        socketId: s.id,
-      })).filter(u => u.userId);
+      // Use a Map to keep unique userId entries
+      const uniqueUsersMap = new Map();
+      for (const s of socketsInRoom) {
+        if (s.data.userId && !uniqueUsersMap.has(s.data.userId)) {
+          uniqueUsersMap.set(s.data.userId, {
+            userId: s.data.userId,
+            username: s.data.username,
+            socketId: s.id,
+          });
+        }
+      }
+      const usersInRoom = Array.from(uniqueUsersMap.values());
 
       // Emit updated list of online users to all clients in this room
       io.to(roomId).emit("online-users", usersInRoom);
@@ -81,20 +88,31 @@ export function setupSocketEvents(io: Server) {
 
       // Get updated list of online users using fetchSockets
       const socketsInRoom = await io.in(roomId).fetchSockets();
-      const usersInRoom = socketsInRoom.map((s) => ({
-        userId: s.data.userId,
-        username: s.data.username,
-        socketId: s.id,
-      })).filter(u => u.userId);
+      // Use a Map to keep unique userId entries
+      const uniqueUsersMap = new Map();
+      for (const s of socketsInRoom) {
+        if (s.data.userId && !uniqueUsersMap.has(s.data.userId)) {
+          uniqueUsersMap.set(s.data.userId, {
+            userId: s.data.userId,
+            username: s.data.username,
+            socketId: s.id,
+          });
+        }
+      }
+      const usersInRoom = Array.from(uniqueUsersMap.values());
         
       io.to(roomId).emit("online-users", usersInRoom);
 
-      socket.to(roomId).emit("user-left", {
-        userId,
-        username,
-        message: `${username} has left the chat.`,
-        timestamp: new Date(),
-      });
+      // Only broadcast user-left if the user has NO OTHER active sockets in the room
+      const isUserStillInRoom = socketsInRoom.some(s => s.data.userId === userId);
+      if (!isUserStillInRoom) {
+        socket.to(roomId).emit("user-left", {
+          userId,
+          username,
+          message: `${username} has left the chat.`,
+          timestamp: new Date(),
+        });
+      }
     });
 
     // Handle disconnecting (tab closed, refresh, etc.)
@@ -112,15 +130,24 @@ export function setupSocketEvents(io: Server) {
 
         // Get updated list of online users using fetchSockets
         const socketsInRoom = await io.in(roomId).fetchSockets();
-        const usersInRoom = socketsInRoom.map((s) => ({
-          userId: s.data.userId,
-          username: s.data.username,
-          socketId: s.id,
-        })).filter(u => u.userId);
+        // Use a Map to keep unique userId entries
+        const uniqueUsersMap = new Map();
+        for (const s of socketsInRoom) {
+          if (s.data.userId && !uniqueUsersMap.has(s.data.userId)) {
+            uniqueUsersMap.set(s.data.userId, {
+              userId: s.data.userId,
+              username: s.data.username,
+              socketId: s.id,
+            });
+          }
+        }
+        const usersInRoom = Array.from(uniqueUsersMap.values());
         
         io.to(roomId).emit("online-users", usersInRoom);
 
-        if (leavingUserId) {
+        // Only broadcast user-left if the user has NO OTHER active sockets in the room
+        const isUserStillInRoom = socketsInRoom.some(s => s.data.userId === leavingUserId);
+        if (leavingUserId && !isUserStillInRoom) {
           socket.to(roomId).emit("user-left", {
             userId: leavingUserId,
             username: leavingUsername,

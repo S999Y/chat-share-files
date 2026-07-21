@@ -263,7 +263,7 @@ export const dbService = {
         ]
       };
       if (userId) {
-        query.$or.push({ isPrivate: true, creatorId: userId });
+        query.$or.push({ isPrivate: true, $or: [{ creatorId: userId }, { members: userId }] });
       }
 
       const rooms = await RoomModel.find(query).sort({ createdAt: -1 });
@@ -286,7 +286,7 @@ export const dbService = {
       const rooms = mockRooms.filter((r) => {
         const isPrivate = r.isPrivate === true;
         if (!isPrivate) return true;
-        return userId ? r.creatorId === userId : false;
+        return userId ? (r.creatorId === userId || (r.members && r.members.includes(userId))) : false;
       });
       return [...rooms].sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
     }
